@@ -1,0 +1,6 @@
+server:
+  port: 3002
+  context: ordering
+
+database:
+  uri: mongodb://localhost:27017/order
