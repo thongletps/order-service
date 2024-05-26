@@ -1,10 +1,10 @@
 // orders/orders.module.ts
-import { Module } from '@nestjs/common';
 import { OrderController } from './controllers/orders.controller';
 import { OrderService } from './services/order.service';
 import { OrderRepository } from './repositories/order.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Order, OrderSchema } from './schemas/order.schema';
+import { Module } from '@nestjs/common';
 
 @Module({
   imports: [

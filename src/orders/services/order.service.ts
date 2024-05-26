@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { OrderRepository } from '../repositories/order.repository';
 import { CreateOrderRequest } from '../../module/dto/create-order-request.dto';
 import { v4 as uuidv4 } from 'uuid';
-import { Order } from '../schemas/order.schema';
+import { Order, OrderItem } from '../schemas/order.schema';
 
 @Injectable()
 export class OrderService {
@@ -17,13 +17,29 @@ export class OrderService {
   }
 
   async create(createOrderDto: CreateOrderRequest): Promise<Order> {
-    const order = {
+    const orderItems: OrderItem[] = Object.entries(
+      createOrderDto.productQuantities || {},
+    ).map(([productId, quantity]) => {
+      const name = `Product ${productId}`; // Replace with actual product name fetching
+      const price = 100; // Replace with actual product price fetching
+      return { productId, name, quantity, price };
+    });
+
+    const totalAmount = orderItems.reduce(
+      (sum, item) => sum + item.quantity * item.price,
+      0,
+    );
+
+    const orderPlain = {
       orderId: uuidv4(),
-      ...createOrderDto,
+      orderItems,
+      totalAmount,
+      orderStatus: createOrderDto.orderStatus || 'pending',
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    return this.orderRepository.create(order);
+
+    return this.orderRepository.create(orderPlain);
   }
 
   async update(

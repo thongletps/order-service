@@ -10,14 +10,19 @@ export class OrderController {
 
   @Get()
   async findAll(): Promise<Order[]> {
-    console.log('hello');
-    return this.orderService.findAll();
+    console.log('GET /orders called');
+    const orders = await this.orderService.findAll();
+    console.log('Found orders:', orders);
+    return orders;
   }
 
   @Post()
   async create(
     @Body(ValidationPipe) createOrderDto: CreateOrderRequest,
   ): Promise<Order> {
-    return this.orderService.create(createOrderDto);
+    console.log('POST /orders called with body:', createOrderDto);
+    const newOrder = await this.orderService.create(createOrderDto);
+    console.log('Created new order:', newOrder);
+    return newOrder;
   }
 }
