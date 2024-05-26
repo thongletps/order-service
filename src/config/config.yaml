@@ -4,3 +4,7 @@ server:
 
 database:
   uri: mongodb://localhost:27017/order
+
+service:
+  url:
+    product: http://localhost:8080/api/products

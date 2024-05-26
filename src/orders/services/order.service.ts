@@ -3,10 +3,14 @@ import { OrderRepository } from '../repositories/order.repository';
 import { CreateOrderRequest } from '../../module/dto/create-order-request.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { Order, OrderItem } from '../schemas/order.schema';
+import { ProductClient } from '../repositories/clients/product.client';
 
 @Injectable()
 export class OrderService {
-  constructor(private readonly orderRepository: OrderRepository) {}
+  constructor(
+    private readonly orderRepository: OrderRepository,
+    private readonly productClient: ProductClient,
+  ) {}
 
   async findAll(): Promise<Order[]> {
     return this.orderRepository.findAll();
