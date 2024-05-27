@@ -4,6 +4,8 @@ import { CreateOrderRequest } from '../../module/dto/create-order-request.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { Order, OrderItem } from '../schemas/order.schema';
 import { ProductClient } from '../repositories/clients/product.client';
+import { StandardResponseDto } from '../../module/dto/standard-response.dto';
+import { ProductResponseDto } from '../../module/dto/product/product.response.dto';
 
 @Injectable()
 export class OrderService {
@@ -21,13 +23,32 @@ export class OrderService {
   }
 
   async create(createOrderDto: CreateOrderRequest): Promise<Order> {
-    const orderItems: OrderItem[] = Object.entries(
-      createOrderDto.productQuantities || {},
-    ).map(([productId, quantity]) => {
-      const name = `Product ${productId}`; // Replace with actual product name fetching
-      const price = 100; // Replace with actual product price fetching
-      return { productId, name, quantity, price };
-    });
+    const orderItems: OrderItem[] = await Promise.all(
+      Object.entries(createOrderDto.productQuantities || {}).map(
+        async ([productId, quantity]) => {
+          try {
+            const productResponse: StandardResponseDto<ProductResponseDto> =
+              await this.productClient.getProductByProductId(productId);
+            const product = productResponse.data;
+
+            return {
+              productId,
+              name: product.name,
+              quantity,
+              price: product.price,
+            };
+          } catch (error) {
+            console.error(
+              `Error fetching product details for productId ${productId}:`,
+              error,
+            );
+            throw new Error(
+              `Could not fetch details for productId ${productId}`,
+            );
+          }
+        },
+      ),
+    );
 
     const totalAmount = orderItems.reduce(
       (sum, item) => sum + item.quantity * item.price,
